@@ -101,7 +101,7 @@ else:
                  "widgets_values": [1.5, "Linear", 8, "Half tile offset", 8, 32, "euler_ancestral", "normal", 25, 7, 0.35]},
                 {"id": 14, "type": "SaveImage", "pos": [1850, 400], "size": [220, 50],
                  "inputs": [{"name": "images", "type": "IMAGE", "links": [22], "slot_index": 0}],
-                 "widgets_values": [title[:30] + ".png"}]},
+                 "widgets_values": [title[:30] + ".png"]}]},
             "links": [[1, 1, 0, 5, 0, "MODEL"], [2, 1, 1, 2, 0, "CLIP"], [3, 1, 1, 3, 0, "CLIP"],
                       [4, 1, 2, 6, 1, "VAE"], [5, 2, 0, 5, 1, "CONDITIONING"], [6, 2, 0, 9, 1, "CONDITIONING"],
                       [7, 3, 0, 5, 2, "CONDITIONING"], [8, 3, 0, 9, 2, "CONDITIONING"], [9, 4, 0, 5, 3, "LATENT"],
