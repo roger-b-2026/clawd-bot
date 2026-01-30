@@ -1,0 +1,48 @@
+
+# Pose Reference Download Guide for mia_delacroix
+
+Since automated access to stock photo sites is limited, please manually download
+images from these sources and save them to this folder.
+
+## Categories Needed: standing, seated, reclining, uniform
+
+## Search Terms for Each Category:
+
+### Standing Poses:
+- "confident woman standing pose"
+- "fashion model standing pose"
+- "sexy standing pose reference"
+
+### Seated Poses:
+- "elegant woman seated pose"
+- "fashion seated pose reference"
+- "sexy sitting pose"
+
+### Reclining Poses:
+- "bikini reclining pose"
+- "lingerie reclining pose"
+- "beach reclining pose"
+
+### Action Poses (Model-Specific):
+- For Cristie: "DJ posing", "beach dancing", "surfing pose"
+- For Lexi: "horse riding pose", "rock climbing", "motorcycle pose"
+- For Mia: "flight attendant pose", "hotel suite pose", "silk robe pose"
+
+## Free Sources:
+1. **Pinterest** - Search each term, right-click "Save image"
+2. **Google Images** - Search → Tools → Usage rights → Creative Commons
+3. **Unsplash** - https://unsplash.com (free, no account needed)
+4. **Pexels** - https://pexels.com (free, may need API key)
+
+## Quick Download Steps:
+1. Open Pinterest or Google Images
+2. Search: "[model] pose reference [category]"
+3. Filter: "Usage rights" → "Creative Commons" or "Free to use"
+4. Download 10-15 images per category
+5. Save to: this folder
+6. Rename: use category numbering (standing_01.jpg, standing_02.jpg, etc.)
+
+## File Naming Convention:
+- standing_01.jpg, standing_02.jpg, ...
+- seated_01.jpg, seated_02.jpg, ...
+- reclining_01.jpg, reclining_02.jpg, ...

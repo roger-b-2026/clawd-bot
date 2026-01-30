@@ -1,0 +1,19 @@
+
+# AI Pose Generation (ControlNet OpenPose)
+
+Once ComfyUI is running with ControlNet, you can generate clean pose templates
+from any reference image.
+
+## Workflow:
+1. Load any reference image (Pinterest, stock photo, etc.)
+2. Connect to OpenPose ControlNet node
+3. Extract pose skeleton (clean, no face/body, just skeleton)
+4. Save as pose template for InstantID generation
+
+## Purpose:
+- Extract pose from professional photoshoots
+- Create reusable pose templates
+- Build your custom library over time
+
+## When Ready:
+Use ComfyUI → ControlNet → OpenPose to extract poses from your reference images.

@@ -1,0 +1,213 @@
+#!/usr/bin/env python3
+"""Generate ComfyUI Base + Refiner + Upscale workflow JSON"""
+
+import json
+
+# Detailed photorealistic prompts
+POSITIVE_PROMPT = """full body shot, young woman standing confidently, professional fashion photography, photorealistic, dslr, soft lighting, high quality, film grain, Fujifilm XT3, 8k uhd, hyperrealistic, lifelike, natural skin texture, realistic eyes, detailed pores, natural lighting, cinematic composition, sharp focus, professional camera work, shallow depth of field, ambient lighting"""
+
+NEGATIVE_PROMPT = """ugly, deformed, noisy, blurry, low quality, bad anatomy, extra fingers, watermark, text, cartoon, anime, illustration, painting, drawing, art, artificial, plastic skin, airbrushed, smooth skin, mannequin, doll-like, cgi, 3d render, overexposed, underexposed, oversaturated, bad proportions, distorted face, ugly eyes"""
+
+# Workflow data
+workflow = {
+    "last_node_id": 15,
+    "last_link_id": 30,
+    "nodes": [
+        {
+            "id": 1,
+            "type": "CheckpointLoaderSimple",
+            "pos": [0, 400],
+            "size": [320, 100],
+            "outputs": [
+                {"name": "MODEL", "type": "MODEL", "links": [1], "slot_index": 0},
+                {"name": "CLIP", "type": "CLIP", "links": [2, 3], "slot_index": 1},
+                {"name": "VAE", "type": "VAE", "links": [4], "slot_index": 2}
+            ],
+            "widgets_values": ["Juggernaut-XL.safetensors"]
+        },
+        {
+            "id": 2,
+            "type": "CLIPTextEncode",
+            "pos": [350, 50],
+            "size": [420, 150],
+            "inputs": [{"name": "clip", "type": "CLIP", "links": [2], "slot_index": 0}],
+            "outputs": [{"name": "CONDITIONING", "type": "CONDITIONING", "links": [5, 6, 20], "slot_index": 0}],
+            "widgets_values": [POSITIVE_PROMPT]
+        },
+        {
+            "id": 3,
+            "type": "CLIPTextEncode",
+            "pos": [350, 250],
+            "size": [420, 150],
+            "inputs": [{"name": "clip", "type": "CLIP", "links": [3], "slot_index": 0}],
+            "outputs": [{"name": "CONDITIONING", "type": "CONDITIONING", "links": [7, 8, 21], "slot_index": 0}],
+            "widgets_values": [NEGATIVE_PROMPT]
+        },
+        {
+            "id": 4,
+            "type": "EmptyLatentImage",
+            "pos": [0, 150],
+            "size": [320, 80],
+            "outputs": [{"name": "LATENT", "type": "LATENT", "links": [9], "slot_index": 0}],
+            "widgets_values": [1, 1024, 1024]
+        },
+        {
+            "id": 5,
+            "type": "KSampler",
+            "pos": [0, 550],
+            "size": [320, 200],
+            "inputs": [
+                {"name": "model", "type": "MODEL", "links": [1], "slot_index": 0},
+                {"name": "positive", "type": "CONDITIONING", "links": [5], "slot_index": 1},
+                {"name": "negative", "type": "CONDITIONING", "links": [7], "slot_index": 2},
+                {"name": "latent_image", "type": "LATENT", "links": [9], "slot_index": 3}
+            ],
+            "outputs": [{"name": "LATENT", "type": "LATENT", "links": [10, 11], "slot_index": 0}],
+            "widgets_values": [42, "fixed", 40, 6, "dpmpp_2m", "karras", 1.0]
+        },
+        {
+            "id": 6,
+            "type": "VAEDecode",
+            "pos": [350, 550],
+            "size": [220, 50],
+            "inputs": [
+                {"name": "samples", "type": "LATENT", "links": [10], "slot_index": 0},
+                {"name": "vae", "type": "VAE", "links": [4], "slot_index": 1}
+            ],
+            "outputs": [{"name": "IMAGE", "type": "IMAGE", "links": [12], "slot_index": 0}]
+        },
+        {
+            "id": 7,
+            "type": "SaveImage",
+            "pos": [600, 550],
+            "size": [220, 50],
+            "inputs": [{"name": "images", "type": "IMAGE", "links": [12], "slot_index": 0}],
+            "widgets_values": ["Base_Output"]
+        },
+        {
+            "id": 8,
+            "type": "VAEEncode",
+            "pos": [350, 350],
+            "size": [220, 50],
+            "inputs": [
+                {"name": "pixels", "type": "IMAGE", "links": [12], "slot_index": 0},
+                {"name": "vae", "type": "VAE", "links": [4], "slot_index": 1}
+            ],
+            "outputs": [{"name": "LATENT", "type": "LATENT", "links": [13], "slot_index": 0}]
+        },
+        {
+            "id": 9,
+            "type": "CheckpointLoaderSimple",
+            "pos": [900, 400],
+            "size": [320, 100],
+            "outputs": [
+                {"name": "MODEL", "type": "MODEL", "links": [14], "slot_index": 0},
+                {"name": "CLIP", "type": "CLIP", "links": None, "slot_index": 1},
+                {"name": "VAE", "type": "VAE", "links": [15], "slot_index": 2}
+            ],
+            "widgets_values": ["SDXL_Refiner.safetensors"]
+        },
+        {
+            "id": 10,
+            "type": "KSampler",
+            "pos": [900, 550],
+            "size": [320, 200],
+            "inputs": [
+                {"name": "model", "type": "MODEL", "links": [14], "slot_index": 0},
+                {"name": "positive", "type": "CONDITIONING", "links": [6], "slot_index": 1},
+                {"name": "negative", "type": "CONDITIONING", "links": [8], "slot_index": 2},
+                {"name": "latent_image", "type": "LATENT", "links": [13], "slot_index": 3}
+            ],
+            "outputs": [{"name": "LATENT", "type": "LATENT", "links": [16], "slot_index": 0}],
+            "widgets_values": [42, "fixed", 25, 5, "dpmpp_2m", "karras", 0.35]
+        },
+        {
+            "id": 11,
+            "type": "VAEDecode",
+            "pos": [1250, 550],
+            "size": [220, 50],
+            "inputs": [
+                {"name": "samples", "type": "LATENT", "links": [16], "slot_index": 0},
+                {"name": "vae", "type": "VAE", "links": [15], "slot_index": 1}
+            ],
+            "outputs": [{"name": "IMAGE", "type": "IMAGE", "links": [17, 18], "slot_index": 0}]
+        },
+        {
+            "id": 12,
+            "type": "SaveImage",
+            "pos": [1500, 550],
+            "size": [220, 50],
+            "inputs": [{"name": "images", "type": "IMAGE", "links": [17], "slot_index": 0}],
+            "widgets_values": ["Refined_Output"]
+        },
+        {
+            "id": 13,
+            "type": "LoadUpscaleModel",
+            "pos": [1250, 100],
+            "size": [260, 60],
+            "outputs": [{"name": "upscale_model", "type": "UPSCALE_MODEL", "links": [19], "slot_index": 0}],
+            "widgets_values": ["4x-UltraSharp.pth"]
+        },
+        {
+            "id": 14,
+            "type": "UltimateSDUpscale",
+            "pos": [1500, 250],
+            "size": [300, 400],
+            "inputs": [
+                {"name": "image", "type": "IMAGE", "links": [18], "slot_index": 0},
+                {"name": "upscale_model", "type": "UPSCALE_MODEL", "links": [19], "slot_index": 1},
+                {"name": "positive", "type": "CONDITIONING", "links": [20], "slot_index": 2},
+                {"name": "negative", "type": "CONDITIONING", "links": [21], "slot_index": 3}
+            ],
+            "outputs": [{"name": "IMAGE", "type": "IMAGE", "links": [22], "slot_index": 0}],
+            "widgets_values": [1.5, "Linear", 8, "Half tile offset", 8, 32, "euler_ancestral", "normal", 25, 7, 0.35]
+        },
+        {
+            "id": 15,
+            "type": "SaveImage",
+            "pos": [1850, 400],
+            "size": [220, 50],
+            "inputs": [{"name": "images", "type": "IMAGE", "links": [22], "slot_index": 0}],
+            "widgets_values": ["Final_Upscaled"]
+        }
+    ],
+    "links": [
+        [1, 1, 0, 5, 0, "MODEL"],
+        [2, 1, 1, 2, 0, "CLIP"],
+        [3, 1, 1, 3, 0, "CLIP"],
+        [4, 1, 2, 6, 1, "VAE"],
+        [5, 2, 0, 5, 1, "CONDITIONING"],
+        [6, 2, 0, 10, 1, "CONDITIONING"],
+        [7, 3, 0, 5, 2, "CONDITIONING"],
+        [8, 3, 0, 10, 2, "CONDITIONING"],
+        [9, 4, 0, 5, 3, "LATENT"],
+        [10, 5, 0, 6, 0, "LATENT"],
+        [11, 5, 0, 8, 0, "LATENT"],
+        [12, 6, 0, 7, 0, "IMAGE"],
+        [12, 6, 0, 8, 0, "IMAGE"],
+        [13, 8, 0, 10, 3, "LATENT"],
+        [14, 9, 0, 10, 0, "MODEL"],
+        [15, 9, 2, 11, 1, "VAE"],
+        [16, 10, 0, 11, 0, "LATENT"],
+        [17, 11, 0, 12, 0, "IMAGE"],
+        [18, 11, 0, 14, 0, "IMAGE"],
+        [19, 13, 0, 14, 1, "UPSCALE_MODEL"],
+        [20, 2, 0, 14, 2, "CONDITIONING"],
+        [21, 3, 0, 14, 3, "CONDITIONING"],
+        [22, 14, 0, 15, 0, "IMAGE"]
+    ],
+    "version": 0.4
+}
+
+# Save workflow
+output_path = "base_refiner_upscaled.json"
+with open(output_path, 'w') as f:
+    json.dump(workflow, f, indent=2)
+
+print(f"✅ Workflow saved to: {output_path}")
+print(f"   Nodes: {len(workflow['nodes'])}")
+print(f"   Connections: {len(workflow['links'])}")
+print("\nWorkflow flow:")
+print("  1. Base Model (Juggernaut-XL) → KSampler(Base) → VAEDecode → VAEEncode")
+print("  2. Refiner Model (SDXL_Refiner) → KSampler(Refiner) → VAEDecode")
+print("  3. UltimateSDUpscale (4x-UltraSharp) → SaveImage(Final_Upscaled)")
